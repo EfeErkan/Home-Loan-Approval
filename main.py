@@ -1,6 +1,6 @@
 import time
 import pandas as pd
-from preprocessing import data_cleaning
+from preprocessing import data_cleaning, data_reformatting
 from naiveBayes import Naive_Bayes_Classifier
 
 def main():
@@ -16,12 +16,19 @@ def main():
     for feature in non_numeric_features:
         print(f'Unique values of {feature}: {train_df[feature].unique()}')
 
+    # Naive Bayes Classifier
+    
     non_numeric_test_data = {'Gender': 'Male', 'Married': 'Yes', 'Dependents': 0, 'Education': 'Graduate', 'Self_Employed': 'No', 'Property_Area': 'Urban', 'Credit_History': 1}
     numeric_test_data = {'ApplicantIncome': 5720, 'CoapplicantIncome': 0, 'LoanAmount': 110, 'Loan_Amount_Term': 360}
     
     timm = time.time() * 1000
     result = Naive_Bayes_Classifier(train_df, non_numeric_test_data, numeric_test_data)
     print(time.time() * 1000 - timm, result)
+    
+    # Logistic Regression
+    
+    data_reformatting(train_df)
+    
 
 if __name__ == '__main__':
     main()

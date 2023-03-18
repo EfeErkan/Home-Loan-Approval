@@ -8,7 +8,7 @@ def convert_column_to_int(df: pd.DataFrame, feature_list):
 
 # Fundamental Functions
 
-def data_cleaning(df: pd.DataFrame, drop_feature_list, fill_feature_list) -> None:
+def data_cleaning(df: pd.DataFrame, drop_feature_list, fill_feature_list):
     df.dropna(subset=drop_feature_list, inplace=True)
     for feature in fill_feature_list:
         mean_value = df[feature].mean()
@@ -16,3 +16,22 @@ def data_cleaning(df: pd.DataFrame, drop_feature_list, fill_feature_list) -> Non
     df['Dependents'].replace('3+', '3', inplace=True)
     convert_column_to_int(df, feature_list=['Credit_History', 'Dependents'])
     
+def data_reformatting(df: pd.DataFrame):
+    df['Gender'].replace('Male', 0, inplace=True)
+    df['Gender'].replace('Female', 1, inplace=True)
+    
+    df['Married'].replace('No', 0, inplace=True)
+    df['Married'].replace('Yes', 1, inplace=True)
+    
+    df['Education'].replace('Not Graduate', 0, inplace=True)
+    df['Education'].replace('Graduate', 1, inplace=True)
+    
+    df['Self_Employed'].replace('No', 0, inplace=True)
+    df['Self_Employed'].replace('Yes', 1, inplace=True)
+    
+    df['Property_Area'].replace('Rural', 0, inplace=True)
+    df['Property_Area'].replace('Semiurban', 1, inplace=True)
+    df['Property_Area'].replace('Urban', 2, inplace=True)
+    
+    df['Loan_Status'].replace('N', 0, inplace=True)
+    df['Loan_Status'].replace('Y', 1, inplace=True)
