@@ -2,6 +2,7 @@ import time
 import pandas as pd
 from preprocessing import data_cleaning, data_reformatting
 from naiveBayes import Naive_Bayes_Classifier
+from logisticRegression import Logistic_Regression_Train
 
 def main():
     train_df = pd.read_csv('data/loan_sanction_train.csv')
@@ -28,6 +29,8 @@ def main():
     # Logistic Regression
     
     data_reformatting(train_df)
+    print(train_df.info())
+    print(Logistic_Regression_Train(train_df))
     
 
 if __name__ == '__main__':
