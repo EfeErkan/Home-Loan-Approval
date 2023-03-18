@@ -24,8 +24,6 @@ def Naive_Bayes_Classifier(train_df: pd.DataFrame, non_numeric_test_data, numeri
     prior_yes_prob *= len(accepted_df) / data_count
     prior_no_prob *= len(declined_df) / data_count
 
-    print(prior_yes_prob, prior_no_prob)
-
     if prior_yes_prob > prior_no_prob:
         return "Y"
     else:

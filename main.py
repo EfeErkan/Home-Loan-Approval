@@ -1,3 +1,4 @@
+import time
 import pandas as pd
 from preprocessing import data_cleaning
 from naiveBayes import Naive_Bayes_Classifier
@@ -18,8 +19,9 @@ def main():
     non_numeric_test_data = {'Gender': 'Male', 'Married': 'Yes', 'Dependents': 0, 'Education': 'Graduate', 'Self_Employed': 'No', 'Property_Area': 'Urban', 'Credit_History': 1}
     numeric_test_data = {'ApplicantIncome': 5720, 'CoapplicantIncome': 0, 'LoanAmount': 110, 'Loan_Amount_Term': 360}
     
+    timm = time.time() * 1000
     result = Naive_Bayes_Classifier(train_df, non_numeric_test_data, numeric_test_data)
-    print(result)
+    print(time.time() * 1000 - timm, result)
 
 if __name__ == '__main__':
     main()
