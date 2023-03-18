@@ -1,6 +1,6 @@
 import pandas as pd
 from preprocessing import data_cleaning
-from naiveBayes import naiveBayes
+from naiveBayes import Naive_Bayes_Classifier
 
 def main():
     train_df = pd.read_csv('data/loan_sanction_train.csv')
@@ -15,10 +15,10 @@ def main():
     for feature in non_numeric_features:
         print(f'Unique values of {feature}: {train_df[feature].unique()}')
 
-    non_numeric_test_data = {'Gender': 'Male', 'Married': 'Yes', 'Dependents': 0, 'Education': 'Graduate', 'Self_Employed': 'No', 'Property_Area': 'Urban', 'Credit_History': 0}
-    numeric_test_data = {'ApplicantIncome': 0, 'CoapplicantIncome': 0, 'LoanAmount': 100, 'Loan_Amount_Term': 600}
+    non_numeric_test_data = {'Gender': 'Male', 'Married': 'Yes', 'Dependents': 0, 'Education': 'Graduate', 'Self_Employed': 'No', 'Property_Area': 'Urban', 'Credit_History': 1}
+    numeric_test_data = {'ApplicantIncome': 5720, 'CoapplicantIncome': 0, 'LoanAmount': 110, 'Loan_Amount_Term': 360}
     
-    result = naiveBayes(train_df, non_numeric_test_data, numeric_test_data)
+    result = Naive_Bayes_Classifier(train_df, non_numeric_test_data, numeric_test_data)
     print(result)
 
 if __name__ == '__main__':
