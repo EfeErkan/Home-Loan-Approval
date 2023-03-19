@@ -35,5 +35,14 @@ def Logistic_Regression_Train(df: pd.DataFrame) -> np.ndarray:
     
     return beta_new
 
-def Logistic_Regression_Classifier(beta: np.ndarray, test_data):
-    pass
+def Logistic_Regression_Classifier(beta: np.ndarray, test_data, threshold: float = 0.5) -> str:
+    x = [1]
+    for key in test_data.keys():
+        x.append(test_data[key])
+        
+    logit = float(x @ beta)
+    logistic_val = np.exp(logit) / (1 + np.exp(logit))
+    if logistic_val > threshold:
+        return "Y"
+    else:
+        return "N"
