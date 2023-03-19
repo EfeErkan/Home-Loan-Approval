@@ -40,8 +40,7 @@ def Logistic_Regression_Classifier(beta: np.ndarray, test_data, threshold: float
     for key in test_data.keys():
         x.append(test_data[key])
         
-    logit = float(x @ beta)
-    logistic_val = np.exp(logit) / (1 + np.exp(logit))
+    logistic_val = Logistic_Function(beta, x)
     if logistic_val > threshold:
         return "Y"
     else:
