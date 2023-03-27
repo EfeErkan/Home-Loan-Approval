@@ -1,7 +1,7 @@
 import time
 import pandas as pd
 from preprocessing import data_cleaning, data_reformatting
-from naiveBayes import Naive_Bayes_Classifier, Naive_Bayes_Evaluater
+from naiveBayes import Naive_Bayes_Classifier, Naive_Bayes_Performance_Evaluater
 from logisticRegression import Logistic_Regression_Train, Logistic_Regression_Classifier
 
 def main():
@@ -12,10 +12,10 @@ def main():
     
     data_cleaning(train_df, drop_feature_list=non_numeric_features, fill_feature_list=numeric_features)
     
-    print(train_df.info())
+    #print(train_df.info())
     
-    for feature in non_numeric_features:
-        print(f'Unique values of {feature}: {train_df[feature].unique()}')
+    """ for feature in non_numeric_features:
+        print(f'Unique values of {feature}: {train_df[feature].unique()}') """
 
     # Naive Bayes Classifier
     
@@ -26,7 +26,7 @@ def main():
     result = Naive_Bayes_Classifier(train_df, non_numeric_test_data, numeric_test_data)
     print("Naive Bayes Classifier", time.time() * 1000 - timm, result)
     
-    Naive_Bayes_Evaluater(train_df, 10)
+    print(Naive_Bayes_Performance_Evaluater(train_df, k_fold=10))
     # Logistic Regression
     
     test_data = {'Gender': 1, 'Married': 1, 'Dependents': 0, 'Education': 1, 'Self_Employed': 0,

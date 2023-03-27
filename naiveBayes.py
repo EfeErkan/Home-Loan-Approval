@@ -5,13 +5,13 @@ import math
 def Naive_Bayes_Classifier(train_df: pd.DataFrame, non_numeric_test_data, numeric_test_data):
     prior_yes_prob = 1
     prior_no_prob = 1
-    data_count = float (len(train_df))
+    data_count = len(train_df)
     accepted_df = train_df.query("Loan_Status == 'Y'")
     declined_df = train_df.query("Loan_Status == 'N'")
     
     for key in non_numeric_test_data.keys():
-        prior_yes_prob *= countFeature(accepted_df, key, non_numeric_test_data[key]) / float(len(accepted_df))
-        prior_no_prob *= countFeature(declined_df, key, non_numeric_test_data[key]) / float(len(declined_df))
+        prior_yes_prob *= countFeature(accepted_df, key, non_numeric_test_data[key]) / len(accepted_df)
+        prior_no_prob *= countFeature(declined_df, key, non_numeric_test_data[key]) / len(declined_df)
         
     for key in numeric_test_data.keys():
         prior_yes_mean = accepted_df[key].mean()
@@ -26,14 +26,14 @@ def Naive_Bayes_Classifier(train_df: pd.DataFrame, non_numeric_test_data, numeri
     prior_no_prob *= len(declined_df) / data_count
 
     if prior_yes_prob > prior_no_prob:
-        return "Y"
+        return "Y", prior_yes_prob
     else:
-        return "N"
+        return "N", prior_no_prob
 
 def Naive_Bayes_Performance_Evaluater(train_df: pd.DataFrame, k_fold: int):
     df = train_df.sample(frac = 1) #shuffle
     size = len(df)
-    accuracy, F1_Score, start = 0.0, 0.0, 0
+    accuracy, F1_Score, Log_Loss, start = 0.0, 0.0, 0.0, 0
 
     while start < size:
         end = start + k_fold
@@ -45,17 +45,21 @@ def Naive_Bayes_Performance_Evaluater(train_df: pd.DataFrame, k_fold: int):
         result = Naive_Bayes_Calculate_Accuracy_and_F1(new_train_df, test_df)
         accuracy += result['Accuracy']
         F1_Score += result['F1_Score']
+        Log_Loss += result['Log_Loss']
         start += k_fold
 
-    print(accuracy / np.ceil(size / k_fold), F1_Score / np.ceil(size / k_fold))
+    return {"Accuracy": accuracy / np.ceil(size / k_fold), "F1_Score": F1_Score / np.ceil(size / k_fold), "Log_Loss": Log_Loss / np.ceil(size / k_fold)}
 
 def Naive_Bayes_Calculate_Accuracy_and_F1(train_df: pd.DataFrame, test_df: pd.DataFrame):
     confusion_matrix = np.zeros((2, 2))
+    log_loss = 0.0
     
     for index, row in test_df.iterrows():
         non_numeric_test_data = {'Gender': row['Gender'], 'Married': row['Married'], 'Dependents': row['Dependents'], 'Education': row['Education'], 'Self_Employed': row['Self_Employed'], 'Property_Area': row['Property_Area'], 'Credit_History': row['Credit_History']}
         numeric_test_data = {'ApplicantIncome': row['ApplicantIncome'], 'CoapplicantIncome': row['CoapplicantIncome'], 'LoanAmount': row['LoanAmount'], 'Loan_Amount_Term': row['Loan_Amount_Term']}
-        result = Naive_Bayes_Classifier(train_df, non_numeric_test_data, numeric_test_data)
+        result, p = Naive_Bayes_Classifier(train_df, non_numeric_test_data, numeric_test_data)
+        y = 1 if (result == 'Y') else 0
+        log_loss += -1 * (y * np.log(p) + (1 - y) * np.log(1 - p))
 
         if result == 'N' and row['Loan_Status'] == 'N': #TN
             confusion_matrix[0,0] += 1
@@ -66,12 +70,17 @@ def Naive_Bayes_Calculate_Accuracy_and_F1(train_df: pd.DataFrame, test_df: pd.Da
         elif result == 'Y' and row['Loan_Status'] == 'Y': #TP
             confusion_matrix[1,1] += 1
         
-    accuracy = float(confusion_matrix[1,1] + confusion_matrix[0,0]) / (confusion_matrix[0,0] + confusion_matrix[0,1] + confusion_matrix[1,0] + confusion_matrix[1,1])
-    precision = float(confusion_matrix[1,1]) / (confusion_matrix[1,1] + confusion_matrix[0,1])
-    recall = float(confusion_matrix[1,1]) / (confusion_matrix[1,1] + confusion_matrix[1,0])
-    F1_Score = 2 * precision * recall / (precision + recall)
+    accuracy = confusion_matrix[1,1] + confusion_matrix[0,0] / (confusion_matrix[0,0] + confusion_matrix[0,1] + confusion_matrix[1,0] + confusion_matrix[1,1])
 
-    return {'Accuracy': accuracy, 'F1_Score': F1_Score}
+    if confusion_matrix[1,1] + confusion_matrix[0,1] == 0 or confusion_matrix[1,1] + confusion_matrix[1,0] == 0:
+        F1_Score = 0
+    else:
+        precision = confusion_matrix[1,1] / (confusion_matrix[1,1] + confusion_matrix[0,1])
+        recall = confusion_matrix[1,1] / (confusion_matrix[1,1] + confusion_matrix[1,0])
+        F1_Score = 2 * precision * recall / (precision + recall)
+
+    print(confusion_matrix)
+    return {'Accuracy': accuracy, 'F1_Score': F1_Score, 'Log_Loss': log_loss / len(test_df)}
 
 def countFeature(df, key, value):
     count = 0
