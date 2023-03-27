@@ -34,7 +34,8 @@ def Naive_Bayes_Performance_Evaluater(train_df: pd.DataFrame, k_fold: int):
     df = train_df.sample(frac = 1) #shuffle
     size = len(df)
     accuracy, F1_Score, Log_Loss, start = 0.0, 0.0, 0.0, 0
-
+    f1_ignore_count = 0
+    
     while start < size:
         end = start + k_fold
         if end > size:
@@ -46,9 +47,11 @@ def Naive_Bayes_Performance_Evaluater(train_df: pd.DataFrame, k_fold: int):
         accuracy += result['Accuracy']
         F1_Score += result['F1_Score']
         Log_Loss += result['Log_Loss']
+        if F1_Score == 0:
+            f1_ignore_count += 1
         start += k_fold
 
-    return {"Accuracy": accuracy / np.ceil(size / k_fold), "F1_Score": F1_Score / np.ceil(size / k_fold), "Log_Loss": Log_Loss / np.ceil(size / k_fold)}
+    return {"Accuracy": accuracy / np.ceil(size / k_fold), "F1_Score": F1_Score / (np.ceil(size / k_fold) - f1_ignore_count), "Log_Loss": Log_Loss / np.ceil(size / k_fold)}
 
 def Naive_Bayes_Calculate_Accuracy_and_F1(train_df: pd.DataFrame, test_df: pd.DataFrame):
     confusion_matrix = np.zeros((2, 2))
@@ -73,13 +76,16 @@ def Naive_Bayes_Calculate_Accuracy_and_F1(train_df: pd.DataFrame, test_df: pd.Da
     accuracy = (confusion_matrix[1,1] + confusion_matrix[0,0]) / (confusion_matrix[0,0] + confusion_matrix[0,1] + confusion_matrix[1,0] + confusion_matrix[1,1])
 
     if confusion_matrix[1,1] + confusion_matrix[0,1] == 0 or confusion_matrix[1,1] + confusion_matrix[1,0] == 0:
-        F1_Score = 0
+        F1_Score = 0 # Ignore invalid F1 score
     else:
         precision = confusion_matrix[1,1] / (confusion_matrix[1,1] + confusion_matrix[0,1])
         recall = confusion_matrix[1,1] / (confusion_matrix[1,1] + confusion_matrix[1,0])
-        F1_Score = 2 * precision * recall / (precision + recall)
+        if precision + recall == 0:
+            F1_Score = 0
+        else:
+            F1_Score = 2 * precision * recall / (precision + recall)
 
-    print(confusion_matrix)
+    #print(confusion_matrix)
     return {'Accuracy': accuracy, 'F1_Score': F1_Score, 'Log_Loss': log_loss / len(test_df)}
 
 def countFeature(df, key, value):
