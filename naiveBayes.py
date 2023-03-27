@@ -70,7 +70,7 @@ def Naive_Bayes_Calculate_Accuracy_and_F1(train_df: pd.DataFrame, test_df: pd.Da
         elif result == 'Y' and row['Loan_Status'] == 'Y': #TP
             confusion_matrix[1,1] += 1
         
-    accuracy = confusion_matrix[1,1] + confusion_matrix[0,0] / (confusion_matrix[0,0] + confusion_matrix[0,1] + confusion_matrix[1,0] + confusion_matrix[1,1])
+    accuracy = (confusion_matrix[1,1] + confusion_matrix[0,0]) / (confusion_matrix[0,0] + confusion_matrix[0,1] + confusion_matrix[1,0] + confusion_matrix[1,1])
 
     if confusion_matrix[1,1] + confusion_matrix[0,1] == 0 or confusion_matrix[1,1] + confusion_matrix[1,0] == 0:
         F1_Score = 0
