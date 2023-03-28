@@ -43,7 +43,7 @@ def Naive_Bayes_Performance_Evaluater(train_df: pd.DataFrame, k_fold: int):
         
         test_df = df.iloc[start : end]
         new_train_df = df.drop(df.index[range(start, end)])
-        result = Naive_Bayes_Calculate_Accuracy_and_F1(new_train_df, test_df)
+        result = Naive_Bayes_Calculate_Measures(new_train_df, test_df)
         accuracy += result['Accuracy']
         F1_Score += result['F1_Score']
         Log_Loss += result['Log_Loss']
@@ -53,7 +53,7 @@ def Naive_Bayes_Performance_Evaluater(train_df: pd.DataFrame, k_fold: int):
 
     return {"Accuracy": accuracy / np.ceil(size / k_fold), "F1_Score": F1_Score / (np.ceil(size / k_fold) - f1_ignore_count), "Log_Loss": Log_Loss / np.ceil(size / k_fold)}
 
-def Naive_Bayes_Calculate_Accuracy_and_F1(train_df: pd.DataFrame, test_df: pd.DataFrame):
+def Naive_Bayes_Calculate_Measures(train_df: pd.DataFrame, test_df: pd.DataFrame):
     confusion_matrix = np.zeros((2, 2))
     log_loss = 0.0
     
