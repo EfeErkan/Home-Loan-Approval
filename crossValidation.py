@@ -1,7 +1,10 @@
 import pandas as pd
 import numpy as np
+from collections.abc import Callable
 
-def Cross_Validation(df: pd.DataFrame, measure_calculation, k_fold: int):
+def Cross_Validation(df: pd.DataFrame, 
+                     measure_calculation_function: Callable[[pd.DataFrame, pd.DataFrame], dict[str, float]], 
+                     k_fold: int):
     df = df.sample(frac = 1) #shuffle
     size = len(df)
     accuracy, F1_Score, Log_Loss, start = 0.0, 0.0, 0.0, 0
@@ -14,7 +17,7 @@ def Cross_Validation(df: pd.DataFrame, measure_calculation, k_fold: int):
         
         test_df = df.iloc[start : end]
         new_train_df = df.drop(df.index[range(start, end)])
-        result = measure_calculation(new_train_df, test_df)
+        result = measure_calculation_function(new_train_df, test_df)
         accuracy += result['Accuracy']
         F1_Score += result['F1_Score']
         Log_Loss += result['Log_Loss']
