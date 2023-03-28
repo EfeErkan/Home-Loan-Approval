@@ -3,8 +3,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from preprocessing import data_cleaning, data_reformatting
-from naiveBayes import Naive_Bayes_Classifier, Naive_Bayes_Performance_Evaluater
-from logisticRegression import Logistic_Regression_Train, Logistic_Regression_Classifier, Logistic_Regression_Performance_Evaluater
+from naiveBayes import Naive_Bayes_Calculate_Measures
+from logisticRegression import Logistic_Regression_Calculate_Measures
+from crossValidation import Cross_Validation
 
 def main():
     train_df = pd.read_csv('data/loan_sanction_train.csv')
@@ -27,7 +28,7 @@ def main():
     data_reformatting(train_df)
     
     for i in range(n):
-        result = Logistic_Regression_Performance_Evaluater(train_df, k_fold=k_folds[i])
+        result = Cross_Validation(train_df, Logistic_Regression_Calculate_Measures, k_fold=k_folds[i])
         accuracies[i] = result['Accuracy']
         f1_scores[i] = result['F1_Score']
         print(f"For k = {i + 1}, Accuracy = {accuracies[i]}, F1 Score = {f1_scores[i]}")
