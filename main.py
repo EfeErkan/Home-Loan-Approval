@@ -20,21 +20,51 @@ def main():
     """ for feature in non_numeric_features:
         print(f'Unique values of {feature}: {train_df[feature].unique()}') """
 
-    n = 5
-    k_folds = np.arange(1, n + 1)
-    accuracies = np.zeros(n)
-    f1_scores = np.zeros(n)
+    # Naive Bayes Performance
+    print("Naive Bayes Classifier")
     
+    print("Cross-Validation with k=1")
+    nb_result_1 = Cross_Validation(train_df, Naive_Bayes_Calculate_Measures, k_fold=1)
+    print(nb_result_1)
+    
+    print("Cross-Validation with k=5")
+    nb_result_5 = Cross_Validation(train_df, Naive_Bayes_Calculate_Measures, k_fold=5)
+    print(nb_result_5)
+    
+    print("Cross-Validation with k=10")
+    nb_result_10 = Cross_Validation(train_df, Naive_Bayes_Calculate_Measures, k_fold=10)
+    print(nb_result_10)
+    
+    # Logistic Regression Performance
     data_reformatting(train_df)
+    print("\nLogistic Regression Classifier")
     
-    for i in range(n):
-        result = Cross_Validation(train_df, Logistic_Regression_Calculate_Measures, k_fold=k_folds[i])
-        accuracies[i] = result['Accuracy']
-        f1_scores[i] = result['F1_Score']
-        print(f"For k = {i + 1}, Accuracy = {accuracies[i]}, F1 Score = {f1_scores[i]}")
-        
-    plt.plot(k_folds, accuracies, label="Accuracy")
-    plt.plot(k_folds, f1_scores, label="F1 Score")
+    print("Cross-Validation with k=1")
+    lr_result_1 = Cross_Validation(train_df, Logistic_Regression_Calculate_Measures, k_fold=1)
+    print(lr_result_1)
+    
+    print("Cross-Validation with k=5")
+    lr_result_5 = Cross_Validation(train_df, Logistic_Regression_Calculate_Measures, k_fold=5)
+    print(lr_result_5)
+    
+    print("Cross-Validation with k=10")
+    lr_result_10 = Cross_Validation(train_df, Logistic_Regression_Calculate_Measures, k_fold=10)
+    print(lr_result_10)
+    
+    # Plotting the performance
+    
+    X = ["k=1", "k=5", "k=10"]
+    naive_bayes = [nb_result_1["F1_Score"], nb_result_5["F1_Score"], nb_result_10["F1_Score"]]
+    logistic_regression = [lr_result_1["F1_Score"], lr_result_5["F1_Score"], lr_result_10["F1_Score"]]
+    
+    X_axis = np.arange(len(X))
+    plt.bar(X_axis - 0.2, naive_bayes, 0.4, label = 'Naive Bayes')
+    plt.bar(X_axis + 0.2, logistic_regression, 0.4, label = 'Logistic Regression')
+    
+    plt.xticks(X_axis, X)
+    plt.xlabel("K Fold")
+    plt.ylabel("F1_Score")
+    plt.title("F1_Score Comparison")
     plt.legend()
     plt.show()
 
