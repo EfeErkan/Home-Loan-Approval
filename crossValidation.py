@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import time
 from collections.abc import Callable
 import matplotlib.pyplot as plt
 from preprocessing import data_reformatting
@@ -13,6 +14,8 @@ def Cross_Validation(df: pd.DataFrame,
     size = len(df)
     accuracy, F1_Score, Log_Loss, start = 0.0, 0.0, 0.0, 0
     f1_ignore_count = 0
+    
+    start_time = time.time()
     
     while start < size:
         end = start + k_fold
@@ -28,19 +31,21 @@ def Cross_Validation(df: pd.DataFrame,
         if F1_Score == 0:
             f1_ignore_count += 1
         start += k_fold
+        
+    end_time = time.time()
 
-    return {"Accuracy": accuracy / np.ceil(size / k_fold), "F1_Score": F1_Score / (np.ceil(size / k_fold) - f1_ignore_count), "Log_Loss": Log_Loss / np.ceil(size / k_fold)}
+    return {"Accuracy": accuracy / np.ceil(size / k_fold), "F1_Score": F1_Score / (np.ceil(size / k_fold) - f1_ignore_count), "Log_Loss": Log_Loss / np.ceil(size / k_fold), "Time": end_time - start_time}
 
 def Plot_Cross_Validation_Results(df:pd.DataFrame, measure_type):
     print("Naive Bayes Classifier")
     
     print("Cross-Validation with k=5")
     nb_result_5 = Cross_Validation(df, Naive_Bayes_Calculate_Measures, k_fold=5)
-    print(f"{measure_type}: {nb_result_5[measure_type]}")
+    print(f"{measure_type}: {nb_result_5[measure_type]}, Time: {nb_result_5['Time']}")
     
     print("Cross-Validation with k=10")
     nb_result_10 = Cross_Validation(df, Naive_Bayes_Calculate_Measures, k_fold=10)
-    print(f"{measure_type}: {nb_result_10[measure_type]}")
+    print(f"{measure_type}: {nb_result_10[measure_type]}, Time: {nb_result_10['Time']}")
     
     # Logistic Regression Performance
     data_reformatting(df)
@@ -48,11 +53,11 @@ def Plot_Cross_Validation_Results(df:pd.DataFrame, measure_type):
     
     print("Cross-Validation with k=5")
     lr_result_5 = Cross_Validation(df, Logistic_Regression_Calculate_Measures, k_fold=5)
-    print(f"{measure_type}: {lr_result_5[measure_type]}")
+    print(f"{measure_type}: {lr_result_5[measure_type]}, Time: {lr_result_5['Time']}")
     
     print("Cross-Validation with k=10")
     lr_result_10 = Cross_Validation(df, Logistic_Regression_Calculate_Measures, k_fold=10)
-    print(f"{measure_type}: {lr_result_10[measure_type]}")
+    print(f"{measure_type}: {lr_result_10[measure_type]}, Time: {lr_result_10['Time']}")
     
     # Plotting the performance
     
