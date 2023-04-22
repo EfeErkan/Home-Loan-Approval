@@ -44,11 +44,11 @@ class Neural_Network:
         
         return dW1, db1, dW2, db2
         
-    def gradient_descent(self, dW1, db1, dW2, db2, learning_rate):
-        self.W1 = self.W1 - learning_rate * dW1
-        self.W2 = self.W2 - learning_rate * dW2
-        self.bias1 = self.bias1 - learning_rate * db1
-        self.bias2 = self.bias2 - learning_rate * db2
+    def gradient_descent(self, dW1, db1, dW2, db2):
+        self.W1 = self.W1 - self.learning_rate * dW1
+        self.W2 = self.W2 - self.learning_rate * dW2
+        self.bias1 = self.bias1 - self.learning_rate * db1
+        self.bias2 = self.bias2 - self.learning_rate * db2
         
     def train(self):
         for i in range(self.epochs):
@@ -78,7 +78,7 @@ class Neural_Network:
     
     @staticmethod
     def RELU_Derivative(x):
-        return 1 * (x > 0)
+        return (x > 0).astype(int)
     
     @staticmethod
     def Sigmoid_Function_Derivative(x):
