@@ -16,7 +16,7 @@ class Neural_Network:
         
         df = df.sample(frac = 1) #shuffle
         self.X = df.iloc[:, 1:12].values
-        self.Y = df.iloc[:, 12].values
+        self.Y = df.iloc[:, 11:12].values
         
         self.learning_rate = learning_rate
         self.epochs = epochs
@@ -54,10 +54,7 @@ class Neural_Network:
         for i in range(self.epochs):
             Z1, A1, Z2, A2 = self.forward_propagation()
             dW1, db1, dW2, db2 = self.backward_propagation(Z1, A1, Z2, A2)
-            self.gradient_descent(dW1, db1, dW2, db2, self.learning_rate)
-            
-            if i % 100 == 0:
-                print('Loss: ', self.loss(A2, self.Y))
+            self.gradient_descent(dW1, db1, dW2, db2)
                 
     def classify(self, X):
         Z1 = np.dot(X, self.W1) + self.bias1
@@ -74,7 +71,7 @@ class Neural_Network:
     
     @staticmethod
     def Sigmoid_Function(x):
-        return 1 / (1 + np.exp(-1 * x))
+        return 1 / (1 + np.exp(-x))
     
     @staticmethod
     def RELU_Derivative(x):
