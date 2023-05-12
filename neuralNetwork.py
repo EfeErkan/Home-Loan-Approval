@@ -31,7 +31,7 @@ class Neural_Network:
         
         return Z1, A1, Z2, A2
     
-    def backward_propagation(self, Z1, A1, Z2, A2):
+    def back_propagation(self, Z1, A1, Z2, A2):
         dZ2 = 2 * (A2 - self.Y) * Neural_Network.Sigmoid_Function_Derivative(Z2)
         dW2 = np.dot(A1.T, dZ2)
         
@@ -52,10 +52,10 @@ class Neural_Network:
             self.X = self.X[np.random.permutation(self.X.shape[0]), :]
             
             Z1, A1, Z2, A2 = self.forward_propagation()
-            dW1, dW2 = self.backward_propagation(Z1, A1, Z2, A2)
+            dW1, dW2 = self.back_propagation(Z1, A1, Z2, A2)
             W1, W2 = self.gradient_descent(dW1, dW2)
             
-            if np.isclose(W1, self.W1, atol=1e-03).all() and np.isclose(W2, self.W2).all():
+            if np.isclose(W1, self.W1, atol=1e-03).all() and np.isclose(W2, self.W2, atol=1e-03).all():
                 break
             
             count += 1
@@ -99,7 +99,7 @@ numeric_features = ['ApplicantIncome', 'CoapplicantIncome', 'LoanAmount', 'Loan_
     
 data_cleaning(train_df, drop_feature_list=non_numeric_features, fill_feature_list=numeric_features)
 
-data_reformatting(train_df, regularize=True)
+data_reformatting(train_df, normalize=True)
 
-NN = Neural_Network(train_df, 11, n=5, learning_rate=0.1, epochs=10)
+NN = Neural_Network(train_df, 11, n=8, learning_rate=0.01)
 NN.train()

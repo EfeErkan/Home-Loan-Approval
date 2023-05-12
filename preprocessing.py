@@ -16,7 +16,7 @@ def data_cleaning(df: pd.DataFrame, drop_feature_list, fill_feature_list):
     df['Dependents'].replace('3+', '3', inplace=True)
     convert_column_to_int(df, feature_list=['Credit_History', 'Dependents'])
     
-def data_reformatting(df: pd.DataFrame, regularize: bool = False):
+def data_reformatting(df: pd.DataFrame, normalize: bool = False):
     df['Gender'].replace('Male', 0, inplace=True)
     df['Gender'].replace('Female', 1, inplace=True)
     
@@ -37,7 +37,7 @@ def data_reformatting(df: pd.DataFrame, regularize: bool = False):
     df['Loan_Status'].replace('Y', 1, inplace=True)
     
     # Regularization
-    if regularize:
+    if normalize:
         df['ApplicantIncome'] = (df['ApplicantIncome'] - df['ApplicantIncome'].mean()) / df['ApplicantIncome'].std()
         df['CoapplicantIncome'] = (df['CoapplicantIncome'] - df['CoapplicantIncome'].mean()) / df['CoapplicantIncome'].std()
         df['LoanAmount'] = (df['LoanAmount'] - df['LoanAmount'].mean()) / df['LoanAmount'].std()
