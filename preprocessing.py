@@ -36,9 +36,8 @@ def data_reformatting(df: pd.DataFrame, normalize: bool = False):
     df['Loan_Status'].replace('N', 0, inplace=True)
     df['Loan_Status'].replace('Y', 1, inplace=True)
     
-    # Regularization
+    # Normalize
     if normalize:
-        df['ApplicantIncome'] = (df['ApplicantIncome'] - df['ApplicantIncome'].mean()) / df['ApplicantIncome'].std()
-        df['CoapplicantIncome'] = (df['CoapplicantIncome'] - df['CoapplicantIncome'].mean()) / df['CoapplicantIncome'].std()
-        df['LoanAmount'] = (df['LoanAmount'] - df['LoanAmount'].mean()) / df['LoanAmount'].std()
-        df['Loan_Amount_Term'] = (df['Loan_Amount_Term'] - df['Loan_Amount_Term'].mean()) / df['Loan_Amount_Term'].std()
+        for feature in df.columns:
+            if feature != 'Loan_Status' and feature != 'Loan_ID':
+                df[feature] = (df[feature] - df[feature].mean()) / df[feature].std()
