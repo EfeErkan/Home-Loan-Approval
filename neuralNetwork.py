@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import time
 
+CONVERGENCE_BOUNDARY = 5000
+
 '''
     Neural Network with 2 hidden layers
     Hidden layers' activation function: ReLU
@@ -13,7 +15,7 @@ class Neural_Network:
         self.W2 = np.random.randn(n, n) - 0.5
         self.W3 = np.random.randn(n, 1) - 0.5
         
-        self.X = df.iloc[:, :12].values
+        self.X = df.iloc[:, :num_of_features + 1].values
         for i in range(len(self.X)):
             self.X[i, 0] = 1
         self.X = self.X.astype(float)
@@ -63,7 +65,7 @@ class Neural_Network:
             dW1, dW2, dW3 = self.back_propagation(Z1, A1, Z2, A2, Z3, A3)
             W1, W2, W3 = self.gradient_descent(dW1, dW2, dW3)
             
-            if np.isclose(W1, self.W1, atol=1e-03).all() and np.isclose(W2, self.W2, atol=1e-03).all():
+            if (np.isclose(W1, self.W1, atol=1e-03).all() and np.isclose(W2, self.W2, atol=1e-03).all()) or count > CONVERGENCE_BOUNDARY:
                 break
             
             count += 1
