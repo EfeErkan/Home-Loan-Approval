@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import time
 
-CONVERGENCE_BOUNDARY = 5000
+CONVERGENCE_BOUNDARY = 1000
 
 '''
     Neural Network with 2 hidden layers
@@ -178,13 +178,13 @@ def Neural_Network_Hyperparameter_Tuning(df:pd.DataFrame):
     learning_rates = [0.1, 0.05, 0.01]
     num_of_hidden_layer_neurons = [5, 10, 15, 20]
     
-    accuracy_values = np.zeros((len(learning_rates), len(num_of_hidden_layer_neurons)))
+    measures = np.empty((len(learning_rates), len(num_of_hidden_layer_neurons)), dtype=object)
     
     for i in range(len(learning_rates)):
         for j in range(len(num_of_hidden_layer_neurons)):
             print(f'learning rate: {learning_rates[i]}, neurons: {num_of_hidden_layer_neurons[j]}')
             result = Neural_Network_Cross_Validation(df, 11, num_of_hidden_layer_neurons[j], learning_rates[i], threshold=0.5, k_fold=10)
-            accuracy_values[i, j] = result['Accuracy']
+            measures[i, j] = result
             print(result)
             print()
     
