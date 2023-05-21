@@ -11,7 +11,8 @@ import time
 class Neural_Network:
     def __init__(self, df:pd.DataFrame, num_of_features:int, n:int, learning_rate:float, threshold:float):
         self.W1 = np.random.randn(num_of_features + 1, n) - 0.5
-        self.W2 = np.random.randn(n, 1) - 0.5
+        self.W2 = np.random.randn(n, n) - 0.5
+        self.W3 = np.random.randn(n, 1) - 0.5
         
         df = df.sample(frac = 1) #shuffle
         self.X = df.iloc[:, 1:12].values
@@ -29,23 +30,30 @@ class Neural_Network:
         A1 = Neural_Network.RELU(Z1)
         
         Z2 = np.dot(A1, self.W2)
-        A2 = Neural_Network.Sigmoid_Function(Z2)
+        A2 = Neural_Network.RELU(Z2)
         
-        return Z1, A1, Z2, A2
+        Z3 = np.dot(A2, self.W3)
+        A3 = Neural_Network.Sigmoid_Function(Z3)
+        
+        return Z1, A1, Z2, A2, Z3, A3
     
-    def back_propagation(self, Z1, A1, Z2, A2):
-        dZ2 = 2 * (A2 - self.Y) * Neural_Network.Sigmoid_Function_Derivative(Z2)
+    def back_propagation(self, Z1, A1, Z2, A2, Z3, A3):
+        dZ3 = 2 * (A3 - self.Y) * Neural_Network.Sigmoid_Function_Derivative(Z3)
+        dW3 = np.dot(A2.T, dZ3)
+        
+        dZ2 = np.dot(dZ3, self.W3.T) * Neural_Network.RELU_Derivative(Z2)
         dW2 = np.dot(A1.T, dZ2)
         
         dZ1 = np.dot(dZ2, self.W2.T) * Neural_Network.RELU_Derivative(Z1)
         dW1 = np.dot(self.X.T, dZ1)
         
-        return dW1, dW2
+        return dW1, dW2, dW3
         
-    def gradient_descent(self, dW1, dW2):
+    def gradient_descent(self, dW1, dW2, dW3):
         W1 = self.W1 - self.learning_rate * dW1
         W2 = self.W2 - self.learning_rate * dW2
-        return W1, W2
+        W3 = self.W3 - self.learning_rate * dW3
+        return W1, W2, W3
         
     def train(self):
         count = 0
@@ -53,9 +61,9 @@ class Neural_Network:
             # Shuffle X
             self.X = self.X[np.random.permutation(self.X.shape[0]), :]
             
-            Z1, A1, Z2, A2 = self.forward_propagation()
-            dW1, dW2 = self.back_propagation(Z1, A1, Z2, A2)
-            W1, W2 = self.gradient_descent(dW1, dW2)
+            Z1, A1, Z2, A2, Z3, A3 = self.forward_propagation()
+            dW1, dW2, dW3 = self.back_propagation(Z1, A1, Z2, A2, Z3, A3)
+            W1, W2, W3 = self.gradient_descent(dW1, dW2, dW3)
             
             if np.isclose(W1, self.W1, atol=1e-03).all() and np.isclose(W2, self.W2, atol=1e-03).all():
                 break
@@ -63,8 +71,9 @@ class Neural_Network:
             count += 1
             self.W1 = W1
             self.W2 = W2
+            self.W3 = W3
             
-            print(f'loss: {np.mean(self.loss(A2, self.Y))}')
+            print(f'loss: {np.mean(self.loss(A3, self.Y))}')
             
         print(f'epochs: {count}')
                 
@@ -73,10 +82,14 @@ class Neural_Network:
         A1 = Neural_Network.RELU(Z1)
         
         Z2 = np.dot(A1, self.W2)
-        A2 = Neural_Network.Sigmoid_Function(Z2)
+        A2 = Neural_Network.RELU(Z2)
         
-        result = (A2 > self.threshold).astype(int)
-        return ('Y' if result == 1 else 'N'), A2
+        Z3 = np.dot(A2, self.W3)
+        A3 = Neural_Network.Sigmoid_Function(Z3)
+        
+        # result = (A3 > self.threshold).astype(int)
+        # return ('Y' if result == 1 else 'N'), A3
+        return A3
     
     @staticmethod
     def RELU(x):
