@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import math
+import time
 
 def Naive_Bayes_Classifier(train_df: pd.DataFrame, non_numeric_test_data, numeric_test_data):
     prior_yes_prob = 1
@@ -64,6 +65,23 @@ def Naive_Bayes_Calculate_Measures(train_df: pd.DataFrame, test_df: pd.DataFrame
 
     #print(confusion_matrix)
     return {'Accuracy': accuracy, 'F1_Score': F1_Score, 'Log_Loss': log_loss / len(test_df)}
+
+def Naive_Bayes_Test(df:pd.DataFrame, count:int = 10):
+    total_accuracy, total_F1_Score, total_log_loss = 0.0, 0.0, 0.0
+    start_time = time.time()
+    
+    # Random 20-80 split
+    for i in range(count):
+        train_df = df.sample(frac=0.8, random_state=1)
+        test_df = df.drop(train_df.index)
+        result = Naive_Bayes_Calculate_Measures(train_df, test_df)
+        total_accuracy += result['Accuracy']
+        total_F1_Score += result['F1_Score']
+        total_log_loss += result['Log_Loss']
+        
+    end_time = time.time()
+    
+    return {'Accuracy': total_accuracy / count, 'F1_Score': total_F1_Score / count, 'Log_Loss': total_log_loss / count, 'Time': end_time - start_time}
 
 def countFeature(df, key, value):
     count = 0
