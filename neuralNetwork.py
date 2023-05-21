@@ -143,7 +143,7 @@ def Neural_Network_Calculate_Measures(train_df:pd.DataFrame, test_df:pd.DataFram
             else:
                 F1_Score = 2 * precision * recall / (precision + recall)
 
-    print(confusion_matrix)
+    #print(confusion_matrix)
     return {'Accuracy': accuracy, 'F1_Score': F1_Score, 'Log_Loss': log_loss / len(test_df)}
 
 def Neural_Network_Cross_Validation(df:pd.DataFrame, num_of_features:int, n:int, learning_rate:float, threshold:float, k_fold:int):
@@ -162,7 +162,7 @@ def Neural_Network_Cross_Validation(df:pd.DataFrame, num_of_features:int, n:int,
         test_df = df.iloc[start : end]
         new_train_df = df.drop(df.index[range(start, end)])
         result = Neural_Network_Calculate_Measures(new_train_df, test_df, num_of_features, n, learning_rate, threshold)
-        print(result)
+        #print(result)
         accuracy += result['Accuracy']
         F1_Score += result['F1_Score']
         Log_Loss += result['Log_Loss']
@@ -173,3 +173,18 @@ def Neural_Network_Cross_Validation(df:pd.DataFrame, num_of_features:int, n:int,
     end_time = time.time()
 
     return {"Accuracy": accuracy / np.ceil(size / k_fold), "F1_Score": F1_Score / (np.ceil(size / k_fold) - f1_ignore_count), "Log_Loss": Log_Loss / np.ceil(size / k_fold), "Time": end_time - start_time}
+
+def Neural_Network_Hyperparameter_Tuning(df:pd.DataFrame):
+    learning_rates = [0.1, 0.05, 0.01]
+    num_of_hidden_layer_neurons = [5, 10, 15, 20]
+    
+    accuracy_values = np.zeros((len(learning_rates), len(num_of_hidden_layer_neurons)))
+    
+    for i in range(len(learning_rates)):
+        for j in range(len(num_of_hidden_layer_neurons)):
+            print(f'learning rate: {learning_rates[i]}, neurons: {num_of_hidden_layer_neurons[j]}')
+            result = Neural_Network_Cross_Validation(df, 11, num_of_hidden_layer_neurons[j], learning_rates[i], threshold=0.5, k_fold=10)
+            accuracy_values[i, j] = result['Accuracy']
+            print(result)
+            print()
+    

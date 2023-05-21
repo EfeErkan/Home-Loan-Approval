@@ -19,7 +19,8 @@ def main():
     
     data_reformatting(train_df, normalize=True)
     
-    print(Neural_Network_Cross_Validation(train_df, 11, n=20, learning_rate=0.05, threshold=0.5, k_fold=10))
+    #print(Neural_Network_Cross_Validation(train_df, 11, n=8, learning_rate=0.05, threshold=0.5, k_fold=10))
+    Neural_Network_Hyperparameter_Tuning(train_df)
 
 if __name__ == '__main__':
     main()
