@@ -1,12 +1,11 @@
 import numpy as np
 import pandas as pd
-from preprocessing import *
 import time
 
 '''
-    Neural Network with 1 hidden layer
-    Hidden layer activation function: ReLU
-    Output layer activation function: Sigmoid
+    Neural Network with 2 hidden layers
+    Hidden layers' activation function: ReLU
+    Output layer's activation function: Sigmoid
 '''
 class Neural_Network:
     def __init__(self, df:pd.DataFrame, num_of_features:int, n:int, learning_rate:float, threshold:float):
@@ -14,10 +13,12 @@ class Neural_Network:
         self.W2 = np.random.randn(n, n) - 0.5
         self.W3 = np.random.randn(n, 1) - 0.5
         
-        df = df.sample(frac = 1) #shuffle
-        self.X = df.iloc[:, 1:12].values
-        self.X = np.append(self.X, np.ones((len(self.X), 1)), axis=1) # Add bias
-        self.Y = df.iloc[:, 11:12].values
+        self.X = df.iloc[:, :12].values
+        for i in range(len(self.X)):
+            self.X[i, 0] = 1
+        self.X = self.X.astype(float)
+        self.Y = df['Loan_Status'].values
+        self.Y = self.Y.reshape((len(self.Y), 1))
         
         self.learning_rate = learning_rate
         self.threshold = threshold
@@ -58,9 +59,6 @@ class Neural_Network:
     def train(self):
         count = 0
         while True:
-            # Shuffle X
-            self.X = self.X[np.random.permutation(self.X.shape[0]), :]
-            
             Z1, A1, Z2, A2, Z3, A3 = self.forward_propagation()
             dW1, dW2, dW3 = self.back_propagation(Z1, A1, Z2, A2, Z3, A3)
             W1, W2, W3 = self.gradient_descent(dW1, dW2, dW3)
@@ -73,9 +71,9 @@ class Neural_Network:
             self.W2 = W2
             self.W3 = W3
             
-            print(f'loss: {np.mean(self.loss(A3, self.Y))}')
+        #     print(f'loss: {np.mean(self.loss(A3, self.Y))}')
             
-        print(f'epochs: {count}')
+        # print(f'epochs: {count}')
                 
     def classify(self, X):
         Z1 = np.dot(X, self.W1)
@@ -87,9 +85,8 @@ class Neural_Network:
         Z3 = np.dot(A2, self.W3)
         A3 = Neural_Network.Sigmoid_Function(Z3)
         
-        # result = (A3 > self.threshold).astype(int)
-        # return ('Y' if result == 1 else 'N'), A3
-        return A3
+        result = (A3 > self.threshold).astype(int)
+        return ('Y' if result == 1 else 'N'), A3.item()
     
     @staticmethod
     def RELU(x):
@@ -115,10 +112,13 @@ def Neural_Network_Calculate_Measures(train_df:pd.DataFrame, test_df:pd.DataFram
     NN.train()
     
     for i in range(len(test_df)):
-        result, p = NN.classify(test_df.iloc[i, 1:12].values)
-        actual = test_df.iloc[i, 11:12].values
+        test_array = test_df.iloc[i, 0:12].values
+        test_array[0] = 1
+        result, p = NN.classify(test_array)
+        actual = test_df.iloc[i, 12]
         y = 1 if (result == 'Y') else 0
-        log_loss += -1 * (y * np.log(p) + (1 - y) * np.log(1 - p))
+        if p != 0 and p != 1:
+            log_loss += -1 * (y * np.log(p) + (1 - y) * np.log(1 - p))
         
         if result == 'N' and actual == 0: #TN
             confusion_matrix[0,0] += 1
@@ -141,7 +141,7 @@ def Neural_Network_Calculate_Measures(train_df:pd.DataFrame, test_df:pd.DataFram
             else:
                 F1_Score = 2 * precision * recall / (precision + recall)
 
-    #print(confusion_matrix)
+    print(confusion_matrix)
     return {'Accuracy': accuracy, 'F1_Score': F1_Score, 'Log_Loss': log_loss / len(test_df)}
 
 def Neural_Network_Cross_Validation(df:pd.DataFrame, num_of_features:int, n:int, learning_rate:float, threshold:float, k_fold:int):
@@ -160,6 +160,7 @@ def Neural_Network_Cross_Validation(df:pd.DataFrame, num_of_features:int, n:int,
         test_df = df.iloc[start : end]
         new_train_df = df.drop(df.index[range(start, end)])
         result = Neural_Network_Calculate_Measures(new_train_df, test_df, num_of_features, n, learning_rate, threshold)
+        print(result)
         accuracy += result['Accuracy']
         F1_Score += result['F1_Score']
         Log_Loss += result['Log_Loss']

@@ -1,8 +1,6 @@
-import time
 import pandas as pd
-import numpy as np
-from preprocessing import data_cleaning
-from crossValidation import Plot_Cross_Validation_Results
+from preprocessing import *
+from neuralNetwork import *
 
 def main():
     train_df = pd.read_csv('data/loan_sanction_train.csv')
@@ -14,10 +12,14 @@ def main():
     
     #print(train_df.info())
     
-    """ for feature in non_numeric_features:
-        print(f'Unique values of {feature}: {train_df[feature].unique()}') """
+    # """ for feature in non_numeric_features:
+    #     print(f'Unique values of {feature}: {train_df[feature].unique()}') """
 
-    Plot_Cross_Validation_Results(train_df, "Accuracy")
+    # Plot_Cross_Validation_Results(train_df, "Accuracy")
+    
+    data_reformatting(train_df, normalize=True)
+    
+    print(Neural_Network_Cross_Validation(train_df, 11, n=20, learning_rate=0.05, threshold=0.5, k_fold=10))
 
 if __name__ == '__main__':
     main()
