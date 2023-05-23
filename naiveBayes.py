@@ -67,21 +67,26 @@ def Naive_Bayes_Calculate_Measures(train_df: pd.DataFrame, test_df: pd.DataFrame
     return {'Accuracy': accuracy, 'F1_Score': F1_Score, 'Log_Loss': log_loss / len(test_df)}
 
 def Naive_Bayes_Test(df:pd.DataFrame, count:int = 10):
-    total_accuracy, total_F1_Score, total_log_loss = 0.0, 0.0, 0.0
-    start_time = time.time()
+    total_accuracy, total_F1_Score, total_log_loss, total_time = 0.0, 0.0, 0.0, 0.0
     
     # Random 20-80 split
     for i in range(count):
+        # shuffle data
+        df = df.sample(frac=1).reset_index(drop=True)
         train_df = df.sample(frac=0.8, random_state=1)
         test_df = df.drop(train_df.index)
+        
+        start_time = time.time()
         result = Naive_Bayes_Calculate_Measures(train_df, test_df)
+        end_time = time.time()
+        print(f'Iteration {i + 1} => {result}')
+        
         total_accuracy += result['Accuracy']
         total_F1_Score += result['F1_Score']
         total_log_loss += result['Log_Loss']
-        
-    end_time = time.time()
+        total_time += end_time - start_time
     
-    return {'Accuracy': total_accuracy / count, 'F1_Score': total_F1_Score / count, 'Log_Loss': total_log_loss / count, 'Time': end_time - start_time}
+    return {'Average Accuracy': total_accuracy / count, 'Average F1_Score': total_F1_Score / count, 'Average Log_Loss': total_log_loss / count, 'Average Time': total_time / count}
 
 def countFeature(df, key, value):
     count = 0

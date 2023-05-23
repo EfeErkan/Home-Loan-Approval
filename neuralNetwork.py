@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import time
+# import matplotlib.pyplot as plt
 
 CONVERGENCE_BOUNDARY = 1000
 
@@ -60,6 +61,8 @@ class Neural_Network:
         
     def train(self):
         count = 0
+        # losses = []
+        # epochs = []
         while True:
             Z1, A1, Z2, A2, Z3, A3 = self.forward_propagation()
             dW1, dW2, dW3 = self.back_propagation(Z1, A1, Z2, A2, Z3, A3)
@@ -73,9 +76,16 @@ class Neural_Network:
             self.W2 = W2
             self.W3 = W3
             
-        #     print(f'loss: {np.mean(self.loss(A3, self.Y))}')
-            
-        # print(f'epochs: {count}')
+        #     losses.append(np.mean(self.loss(A3, self.Y)))
+        #     epochs.append(count)
+        #     #print(f'loss: {np.mean(self.loss(A3, self.Y))}')
+        
+        # np_losses = np.array(losses)
+        # np_epochs = np.array(epochs)
+        # plt.plot(np_epochs, np_losses)
+        # plt.xlabel('Epochs')
+        # plt.ylabel('Loss')
+        # plt.show()
                 
     def classify(self, X):
         Z1 = np.dot(X, self.W1)
@@ -187,20 +197,26 @@ def Neural_Network_Hyperparameter_Tuning(df:pd.DataFrame):
             measures[i, j] = result
             print(result)
             print()
+    print(measures)
             
 def Neural_Network_Test(df:pd.DataFrame, num_of_features:int, n:int, learning_rate:float, threshold:float = 0.5, count:int = 10):
-    total_accuracy, total_F1_Score, total_log_loss = 0.0, 0.0, 0.0
-    start = time.time()
+    total_accuracy, total_F1_Score, total_log_loss, total_time = 0.0, 0.0, 0.0, 0.0
+    
     
     for i in range(count):
         # Random 20-80 split
+        df = df.sample(frac = 1).reset_index(drop = True)
         train_df = df.sample(frac = 0.8, random_state = 1)
         test_df = df.drop(train_df.index)
+        
+        start = time.time()
         result = Neural_Network_Calculate_Measures(train_df, test_df, num_of_features, n, learning_rate, threshold)
+        end = time.time()
+        print(f'Iteration {i + 1} => {result}')
+        
         total_accuracy += result['Accuracy']
         total_F1_Score += result['F1_Score']
         total_log_loss += result['Log_Loss']
+        total_time += end - start
     
-    end = time.time()
-    
-    return {'Accuracy': total_accuracy / count, 'F1_Score': total_F1_Score / count, 'Log_Loss': total_log_loss / count, 'Time': end - start}
+    return {'Average Accuracy': total_accuracy / count, 'Average F1_Score': total_F1_Score / count, 'Average Log_Loss': total_log_loss / count, 'Average Time': total_time / count}

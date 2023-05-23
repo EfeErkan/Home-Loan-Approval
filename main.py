@@ -1,5 +1,7 @@
 import pandas as pd
 from preprocessing import *
+from logisticRegression import *
+from naiveBayes import *
 from neuralNetwork import *
 
 def main():
@@ -10,17 +12,16 @@ def main():
     
     data_cleaning(train_df, drop_feature_list=non_numeric_features, fill_feature_list=numeric_features)
     
-    #print(train_df.info())
+    # Naive Bayes Testing
+    print(Naive_Bayes_Test(train_df))
     
-    # """ for feature in non_numeric_features:
-    #     print(f'Unique values of {feature}: {train_df[feature].unique()}') """
-
-    # Plot_Cross_Validation_Results(train_df, "Accuracy")
+    # Logistic Regression Testing
+    data_reformatting(train_df, normalize=False)
+    print(Logistic_Regression_Test(train_df))
     
+    # Neural Network Testing
     data_reformatting(train_df, normalize=True)
+    print(Neural_Network_Test(train_df, 11, n=20, learning_rate=0.1))
     
-    #print(Neural_Network_Cross_Validation(train_df, 11, n=8, learning_rate=0.05, threshold=0.5, k_fold=10))
-    Neural_Network_Hyperparameter_Tuning(train_df)
-
 if __name__ == '__main__':
     main()
