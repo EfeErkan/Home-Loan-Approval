@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import time
-# import matplotlib.pyplot as plt
 
 CONVERGENCE_BOUNDARY = 1000
 
@@ -11,6 +10,14 @@ CONVERGENCE_BOUNDARY = 1000
     Output layer's activation function: Sigmoid
 '''
 class Neural_Network:
+    '''
+        Constructor for Neural_Network class
+        @param df: pandas DataFrame containing data
+        @param num_of_features: int value of the number of features
+        @param n: int value of the number of neurons in the hidden layers
+        @param learning_rate: float value of the learning rate
+        @param threshold: float value of the threshold
+    '''
     def __init__(self, df:pd.DataFrame, num_of_features:int, n:int, learning_rate:float, threshold:float):
         self.W1 = np.random.randn(num_of_features + 1, n) - 0.5
         self.W2 = np.random.randn(n, n) - 0.5
@@ -25,10 +32,19 @@ class Neural_Network:
         
         self.learning_rate = learning_rate
         self.threshold = threshold
-        
+    
+    '''
+        RSS Loss Function
+        @param A2: np.ndarray containing the output layer's activation values
+        @param Y: np.ndarray containing the response vector
+        @return: np.ndarray containing the loss values
+    '''
     def loss(self, A2, Y):
         return np.square(A2 - Y)
-        
+    
+    '''
+        Forward Propagation
+    '''
     def forward_propagation(self):
         Z1 = np.dot(self.X, self.W1)
         A1 = Neural_Network.RELU(Z1)
@@ -41,6 +57,16 @@ class Neural_Network:
         
         return Z1, A1, Z2, A2, Z3, A3
     
+    '''
+        Back Propagation
+        @param Z1: np.ndarray containing the hidden layer's linear values
+        @param A1: np.ndarray containing the hidden layer's activation values
+        @param Z2: np.ndarray containing the hidden layer's linear values
+        @param A2: np.ndarray containing the hidden layer's activation values
+        @param Z3: np.ndarray containing the output layer's linear values
+        @param A3: np.ndarray containing the output layer's activation values
+        @return: np.ndarray containing the gradient values
+    '''
     def back_propagation(self, Z1, A1, Z2, A2, Z3, A3):
         dZ3 = 2 * (A3 - self.Y) * Neural_Network.Sigmoid_Function_Derivative(Z3)
         dW3 = np.dot(A2.T, dZ3)
@@ -52,17 +78,25 @@ class Neural_Network:
         dW1 = np.dot(self.X.T, dZ1)
         
         return dW1, dW2, dW3
-        
+    
+    '''
+        Gradient Descent
+        @param dW1: np.ndarray containing the gradient values of the first layer
+        @param dW2: np.ndarray containing the gradient values of the second layer
+        @param dW3: np.ndarray containing the gradient values of the third layer
+        @return: np.ndarray containing the updated weight values
+    '''
     def gradient_descent(self, dW1, dW2, dW3):
         W1 = self.W1 - self.learning_rate * dW1
         W2 = self.W2 - self.learning_rate * dW2
         W3 = self.W3 - self.learning_rate * dW3
         return W1, W2, W3
-        
+    
+    '''
+        Neural Network Training
+    '''
     def train(self):
         count = 0
-        # losses = []
-        # epochs = []
         while True:
             Z1, A1, Z2, A2, Z3, A3 = self.forward_propagation()
             dW1, dW2, dW3 = self.back_propagation(Z1, A1, Z2, A2, Z3, A3)
@@ -75,18 +109,12 @@ class Neural_Network:
             self.W1 = W1
             self.W2 = W2
             self.W3 = W3
-            
-        #     losses.append(np.mean(self.loss(A3, self.Y)))
-        #     epochs.append(count)
-        #     #print(f'loss: {np.mean(self.loss(A3, self.Y))}')
-        
-        # np_losses = np.array(losses)
-        # np_epochs = np.array(epochs)
-        # plt.plot(np_epochs, np_losses)
-        # plt.xlabel('Epochs')
-        # plt.ylabel('Loss')
-        # plt.show()
-                
+    
+    '''
+        Neural Network Classification after Training
+        @param X: np.ndarray containing the input vector
+        @return: str value of the classification result
+    '''
     def classify(self, X):
         Z1 = np.dot(X, self.W1)
         A1 = Neural_Network.RELU(Z1)
@@ -100,23 +128,53 @@ class Neural_Network:
         result = (A3 > self.threshold).astype(int)
         return ('Y' if result == 1 else 'N'), A3.item()
     
+    '''
+        Rectified Linear Unit (ReLU) Activation Function
+        @param x: np.ndarray containing the input vector
+        @return: np.ndarray containing the activation values
+    '''
     @staticmethod
     def RELU(x):
         return np.maximum(x, 0)
     
+    '''
+        Sigmoid Activation Function
+        @param x: np.ndarray containing the input vector
+        @return: np.ndarray containing the activation values
+    '''
     @staticmethod
     def Sigmoid_Function(x):
         x = np.array(x, dtype=np.float32)
         return 1 / (1 + np.exp(-x))
     
+    '''
+        Rectified Linear Unit (ReLU) Activation Function Derivative
+        @param x: np.ndarray containing the input vector
+        @return: np.ndarray containing the activation values
+    '''
     @staticmethod
     def RELU_Derivative(x):
         return (x > 0).astype(int)
     
+    ''' 
+        Sigmoid Activation Function Derivative
+        @param x: np.ndarray containing the input vector
+        @return: np.ndarray containing the activation values
+    '''
     @staticmethod
     def Sigmoid_Function_Derivative(x):
         return Neural_Network.Sigmoid_Function(x) * (1 - Neural_Network.Sigmoid_Function(x))
 
+'''
+    Neural Network Test Function
+    @param train_df: pd.DataFrame containing the training data
+    @param test_df: pd.DataFrame containing the test data
+    @param num_of_features: int value of the number of features
+    @param n: int value of the number of hidden nodes
+    @param learning_rate: float value of the learning rate
+    @param threshold: float value of the threshold
+    @return: dictionary containing the average accuracy, F1 score, and log loss of the neural network
+'''
 def Neural_Network_Calculate_Measures(train_df:pd.DataFrame, test_df:pd.DataFrame, num_of_features:int, n:int, learning_rate:float, threshold=0.5):
     NN = Neural_Network(train_df, num_of_features, n, learning_rate, threshold)
     confusion_matrix = np.zeros((2, 2))
@@ -156,6 +214,16 @@ def Neural_Network_Calculate_Measures(train_df:pd.DataFrame, test_df:pd.DataFram
     #print(confusion_matrix)
     return {'Accuracy': accuracy, 'F1_Score': F1_Score, 'Log_Loss': log_loss / len(test_df)}
 
+'''
+    Neural Network Cross Validation Function
+    @param df: pd.DataFrame containing the data
+    @param num_of_features: int value of the number of features
+    @param n: int value of the number of hidden nodes
+    @param learning_rate: float value of the learning rate
+    @param threshold: float value of the threshold
+    @param k_fold: int value of the number of folds
+    @return: dictionary containing the average accuracy, F1 score, and log loss of the neural network
+'''
 def Neural_Network_Cross_Validation(df:pd.DataFrame, num_of_features:int, n:int, learning_rate:float, threshold:float, k_fold:int):
     df = df.sample(frac = 1) #shuffle
     size = len(df)
@@ -184,6 +252,10 @@ def Neural_Network_Cross_Validation(df:pd.DataFrame, num_of_features:int, n:int,
 
     return {"Accuracy": accuracy / np.ceil(size / k_fold), "F1_Score": F1_Score / (np.ceil(size / k_fold) - f1_ignore_count), "Log_Loss": Log_Loss / np.ceil(size / k_fold), "Time": end_time - start_time}
 
+'''
+    Neural Network Hyperparameter Tuning Function
+    @param df: pd.DataFrame containing the data
+'''
 def Neural_Network_Hyperparameter_Tuning(df:pd.DataFrame):
     learning_rates = [0.1, 0.05, 0.01]
     num_of_hidden_layer_neurons = [5, 10, 15, 20]
@@ -198,11 +270,20 @@ def Neural_Network_Hyperparameter_Tuning(df:pd.DataFrame):
             print(result)
             print()
     print(measures)
-            
+    
+'''
+    Neural Network Average Test Function
+    @param df: pd.DataFrame containing the data
+    @param num_of_features: int value of the number of features
+    @param n: int value of the number of hidden nodes
+    @param learning_rate: float value of the learning rate
+    @param threshold: float value of the threshold
+    @param count: int value of the number of iterations
+    @return: dictionary containing the average accuracy, F1 score, and log loss of the neural network
+'''
 def Neural_Network_Test(df:pd.DataFrame, num_of_features:int, n:int, learning_rate:float, threshold:float = 0.5, count:int = 10):
     total_accuracy, total_F1_Score, total_log_loss, total_time = 0.0, 0.0, 0.0, 0.0
-    
-    
+
     for i in range(count):
         # Random 20-80 split
         df = df.sample(frac = 1).reset_index(drop = True)

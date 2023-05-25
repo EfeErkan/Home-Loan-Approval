@@ -2,9 +2,20 @@ import pandas as pd
 import numpy as np
 import time
 
+'''
+    Logistic Function
+    @param beta: np.ndarray containing the beta values
+    @param x: np.ndarray containing the x values
+    @return: float value of the logistic function
+'''
 def Logistic_Function(beta, x):
     return np.exp(float(x @ beta)) / (1 + np.exp(float(x @ beta)))
 
+'''
+    Logistic Regression Training for beta values
+    @param df: pandas DataFrame containing data
+    @return: np.ndarray containing trained beta values
+'''
 def Logistic_Regression_Train(df: pd.DataFrame) -> np.ndarray:
     X = df.iloc[:, 0:12].values # Design Matrix
     for i in range(len(X)):
@@ -36,6 +47,13 @@ def Logistic_Regression_Train(df: pd.DataFrame) -> np.ndarray:
     
     return beta_new
 
+'''
+    Logistic Regression Classifier using trained beta values
+    @param beta: np.ndarray containing trained beta values
+    @param test_data: dictionary containing test data
+    @param threshold: float value of the threshold
+    @return: string value of the class label
+'''
 def Logistic_Regression_Classifier(beta: np.ndarray, test_data, threshold: float = 0.5):
     x = [1]
     for key in test_data.keys():
@@ -46,7 +64,13 @@ def Logistic_Regression_Classifier(beta: np.ndarray, test_data, threshold: float
         return "Y", logistic_val
     else:
         return "N", 1 - logistic_val
-   
+
+'''
+    Logistic Regression Test Function
+    @param train_df: pandas DataFrame containing data
+    @param test_df: pandas DataFrame containing data
+    @return: dictionary containing the accuracy, F1 score, and log loss of the Naive Bayes classifier
+'''
 def Logistic_Regression_Calculate_Measures(train_df: pd.DataFrame, test_df: pd.DataFrame):
     confusion_matrix = np.zeros((2, 2))
     log_loss = 0.0
@@ -85,6 +109,12 @@ def Logistic_Regression_Calculate_Measures(train_df: pd.DataFrame, test_df: pd.D
     #print(confusion_matrix)
     return {'Accuracy': accuracy, 'F1_Score': F1_Score, 'Log_Loss': log_loss / len(test_df)}
 
+'''
+    Logistic Regression Average Test Function
+    @param df: pandas DataFrame containing data
+    @param count: int value of the number of times to run the test
+    @return: dictionary containing the average accuracy, F1 score, and log loss of the Naive Bayes classifier
+'''
 def Logistic_Regression_Test(df: pd.DataFrame, count:int = 10):
     total_accuracy, total_F1_score, total_log_loss, total_time = 0.0, 0.0, 0.0, 0.0
 

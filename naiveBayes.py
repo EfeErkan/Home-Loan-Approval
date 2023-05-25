@@ -3,6 +3,13 @@ import numpy as np
 import math
 import time
 
+'''
+    Naive Bayes Classifier
+    @param train_df: pandas DataFrame containing training data
+    @param non_numeric_test_data: dictionary containing non-numeric test data
+    @param numeric_test_data: dictionary containing numeric test data
+    @return: tuple containing the predicted class and the probability of the prediction
+'''
 def Naive_Bayes_Classifier(train_df: pd.DataFrame, non_numeric_test_data, numeric_test_data):
     prior_yes_prob = 1
     prior_no_prob = 1
@@ -31,6 +38,12 @@ def Naive_Bayes_Classifier(train_df: pd.DataFrame, non_numeric_test_data, numeri
     else:
         return "N", prior_no_prob
 
+'''
+    Naive Bayes Test Function
+    @param train_df: pandas DataFrame containing training data
+    @param test_df: pandas DataFrame containing testing data
+    @return: dictionary containing the accuracy, F1 score, and log loss of the Naive Bayes classifier
+'''
 def Naive_Bayes_Calculate_Measures(train_df: pd.DataFrame, test_df: pd.DataFrame):
     confusion_matrix = np.zeros((2, 2))
     log_loss = 0.0
@@ -66,6 +79,12 @@ def Naive_Bayes_Calculate_Measures(train_df: pd.DataFrame, test_df: pd.DataFrame
     #print(confusion_matrix)
     return {'Accuracy': accuracy, 'F1_Score': F1_Score, 'Log_Loss': log_loss / len(test_df)}
 
+'''
+    Naive Bayes Average Test Function
+    @param df: pandas DataFrame containing data
+    @param count: number of times to run the test
+    @return: dictionary containing the average accuracy, F1 score, and log loss of the Naive Bayes classifier
+'''
 def Naive_Bayes_Test(df:pd.DataFrame, count:int = 10):
     total_accuracy, total_F1_Score, total_log_loss, total_time = 0.0, 0.0, 0.0, 0.0
     
@@ -88,6 +107,13 @@ def Naive_Bayes_Test(df:pd.DataFrame, count:int = 10):
     
     return {'Average Accuracy': total_accuracy / count, 'Average F1_Score': total_F1_Score / count, 'Average Log_Loss': total_log_loss / count, 'Average Time': total_time / count}
 
+'''
+    Count Feature Function
+    @param df: pandas DataFrame containing data
+    @param key: key to count
+    @param value: value to count
+    @return: number of times the value appears in the key column
+'''
 def countFeature(df, key, value):
     count = 0
     for row in df.iterrows():
@@ -96,6 +122,13 @@ def countFeature(df, key, value):
 
     return count
 
+'''
+    Gaussian Distribution Function for numeric data
+    @param x: value to calculate the probability of
+    @param mean: mean of the data
+    @param std: standard deviation of the data
+    @return: probability of x
+'''
 def gaussian_dist(x, mean, std):
     variance = float(std) ** 2
     denominator = (2 * math.pi * variance) ** 0.5

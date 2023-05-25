@@ -1,13 +1,20 @@
 import pandas as pd
 
-# Helper Functions
-
+'''
+    Convert pandas dataframe column string to int
+    @param df: pandas dataframe
+    @param feature_list: list of features to be converted
+'''
 def convert_column_to_int(df: pd.DataFrame, feature_list):
     for feature in feature_list:
         df[feature] = df[feature].apply(int)
 
-# Fundamental Functions
-
+'''
+    Clean data by dropping rows with missing values and filling missing values with mean
+    @param df: pandas dataframe
+    @param drop_feature_list: list of features to be dropped
+    @param fill_feature_list: list of features to be filled with mean
+'''
 def data_cleaning(df: pd.DataFrame, drop_feature_list, fill_feature_list):
     df.dropna(subset=drop_feature_list, inplace=True)
     for feature in fill_feature_list:
@@ -15,7 +22,12 @@ def data_cleaning(df: pd.DataFrame, drop_feature_list, fill_feature_list):
         df[feature].fillna(mean_value, inplace=True)
     df['Dependents'].replace('3+', '3', inplace=True)
     convert_column_to_int(df, feature_list=['Credit_History', 'Dependents'])
-    
+
+'''
+    Reformat data by converting string to int for class labels and normalizing data
+    @param df: pandas dataframe
+    @param normalize: boolean value to normalize data or not
+'''
 def data_reformatting(df: pd.DataFrame, normalize: bool = False):
     df['Gender'].replace('Male', 0, inplace=True)
     df['Gender'].replace('Female', 1, inplace=True)
