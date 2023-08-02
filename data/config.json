@@ -1,0 +1,41 @@
+{
+	"initial-table-length": 5,
+    "labels": [
+        {"name": "variable1"},
+        {"name": "variable2"},
+        {"name": "variable3"},
+        {"name": "variable4"},
+        {"name": "variable5"}
+    ],
+    "checkboxes": [
+        {"name": "bool1"},
+        {"name": "bool2"},
+        {"name": "bool3"},
+        {"name": "bool4"}
+    ],
+    "size1-options": [
+    	{"option": "128U"},
+    	{"option": "256U"},
+    	{"option": "512U"},
+    	{"option": "1024U"},
+    	{"option": "2048U"}
+    ],
+    "size2-options": [
+    	{"option": "UINT8"},
+    	{"option": "UINT16"},
+    	{"option": "fault_kayıt_veri_t"}
+     ],
+     "section-options": [
+     	{"option": "DENEME_BUF_RAM_PART"},
+     	{"option": "DENEME_BUF_SDRAM_SECTION"},
+     	{"option": "DENEME_BUF_NC_RAM_SECTION"},
+     	{"option": "DENEME_BUF_NC_SDRAM_SECTION"},
+     	{"option": "DENEME_BUF_SECTION_SAYI"}
+     ],
+     "type-options": [
+     	{"option": "DENEME_BUF_TIP_RING"},
+     	{"option": "DENEME_BUF_TIP_CIFT"},
+     	{"option": "DENEME_BUF_TIP_SAYI"}
+     	 
+     ]
+}
